@@ -281,17 +281,20 @@ class PrecioSpider(scrapy.Spider):
 
     def parse(self, response):
         headers = [
+            "producto",
+            "calidad",
             "presentacion",
             "origen",
             "destino",
             "pMin",
             "pMax",
             "precio",
-            "frec",
             "obs",
         ]
-        print "### paginas: ", response.xpath('//span[@id="lblPaginacion"]/text()').re(ur"Página  1 de  (\d+)")
+
         trs = response.xpath('//table[@id="tblResultados"]/tr[position() >= 3]')
+        producto = ''.join(response.xpath('//td[@class="DatTAB2"][1]/text()').extract()).strip()
+        calidad = ''.join(response.xpath('//td[@class="DatTAB2"][2]/text()').extract()).strip()
         for tr in trs:
             row = tr.xpath('.//td/text()').extract()
-            yield EconomiaItem(**dict(zip(headers, row)))
+            yield EconomiaItem(**dict(zip(headers, [producto, calidad] + row)))
